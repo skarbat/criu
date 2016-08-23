@@ -10,7 +10,6 @@ struct vm_area_list;
 struct page_pipe;
 struct pstree_item;
 
-extern int task_reset_dirty_track(int pid);
 extern bool page_is_zero(u64 pme);
 extern bool page_in_parent(bool dirty);
 extern int prepare_mm_pid(struct pstree_item *i);
