@@ -664,6 +664,18 @@ criu_bin = "../criu/criu"
 join_ns_file = '/run/netns/zdtm_netns'
 
 
+class criu_cli:
+	@staticmethod
+	def run(action, args, fault = None, strace = [], preexec = None):
+		env = None
+		if fault:
+			print "Forcing %s fault" % fault
+			env = dict(os.environ, CRIU_FAULT = fault)
+		cr = subprocess.Popen(strace + [criu_bin, action] + args, env = env, preexec_fn = preexec)
+		if action == "lazy-pages":
+			return cr
+		return cr.wait()
+
 class criu:
 	def __init__(self, opts):
 		self.__test = None
@@ -707,17 +719,6 @@ class criu:
 	def __ddir(self):
 		return os.path.join(self.__dump_path, "%d" % self.__iter)
 
-	@staticmethod
-	def __criu(action, args, fault = None, strace = [], preexec = None):
-		env = None
-		if fault:
-			print "Forcing %s fault" % fault
-			env = dict(os.environ, CRIU_FAULT = fault)
-		cr = subprocess.Popen(strace + [criu_bin, action] + args, env = env, preexec_fn = preexec)
-		if action == "lazy-pages":
-			return cr
-		return cr.wait()
-
 	def set_user_id(self):
 		# Numbers should match those in zdtm_test
 		os.setresgid(58467, 58467, 58467)
@@ -752,7 +753,7 @@ class criu:
 
 		__ddir = self.__ddir()
 
-		ret = self.__criu(action, s_args, self.__fault, strace, preexec)
+		ret = criu_cli.run(action, s_args, self.__fault, strace, preexec)
 		if action == "lazy-pages":
 			return ret
 		grep_errors(os.path.join(__ddir, log))
@@ -769,7 +770,7 @@ class criu:
 					os.rename(os.path.join(__ddir, log), os.path.join(__ddir, log + ".fail"))
 				# try again without faults
 				print "Run criu " + action
-				ret = self.__criu(action, s_args, False, strace, preexec)
+				ret = criu_cli.run(action, s_args, False, strace, preexec)
 				grep_errors(os.path.join(__ddir, log))
 				if ret == 0:
 					return
@@ -861,7 +862,7 @@ class criu:
 
 	@staticmethod
 	def check(feature):
-		return criu.__criu("check", ["-v0", "--feature", feature]) == 0
+		return criu_cli.run("check", ["-v0", "--feature", feature]) == 0
 
 	@staticmethod
 	def available():
