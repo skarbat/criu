@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	echo "skipped"
+
+override_dh_auto_build:
+	make
+
+override_dh_auto_test:
+	echo "skipped"
+
+override_dh_auto_install:
+	make DESTDIR=`pwd`/installed install-core

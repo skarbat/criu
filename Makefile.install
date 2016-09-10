@@ -46,7 +46,11 @@ install-criu: criu
 	$(Q) $(MAKE) $(build)=criu install
 .PHONY: install-criu
 
-install: install-man install-lib install-criu
+install-core: install-lib install-criu
+	@true
+.PHONY: install-core
+
+install: install-man install-core
 	@true
 .PHONY: install
 
