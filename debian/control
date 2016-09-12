@@ -10,6 +10,6 @@ Build-Depends: debhelper (>=9.0.0), libprotobuf-dev, libprotobuf-c-dev,
 Package: criu-rpi
 Architecture: armhf
 Depends: ${shlibs:Depends}, ${misc:Depends}, libprotobuf-c1, python-protobuf,
- libnl-3-200, libc6, python-ipaddr
+ libnl-3-200, libc6, python-ipaddr, iptables
 Description: Criu allows to freeze a running application, then restore
  and run the application from the point it was frozen at.
